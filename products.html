@@ -1,0 +1,144 @@
+<!--
+Desciption: 
+    - Displays all products by category 
+    - Each item has own dropdown description or page 
+    - /products 
+-->
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" href="style.css">
+        <script>
+            async function loadProducts() {
+                const list = document.getElementById("productsList")
+                const msg = document.getElementById("msg")
+
+                list.innerHTML = "<p>Loading products...</p>"
+
+                try {
+                    const res = await fetch("/api/products")
+                    if (!res.ok) {
+                        list.innerHTML = "<p>Could not load products.<p>"
+                        return
+                    }
+
+                    const products = await res.json()
+                    list.innerHTML = ""
+
+                    if (!products.length) {
+                        list.innerHTML = "<p>No products available.</p>"
+                        return
+                    }
+
+                    products.forEach(function(product) {
+                        const box = document.createElement("div")
+                        box.className = "productBox"
+
+                        const img = document.createElement("img")
+                        img.src = product.img
+                        img.className = "productImg"
+                        box.appendChild(img)
+
+                        const title = document.createElement("h3")
+                        title.textContent = product.name
+                        box.appendChild(title)
+
+                        const category = document.createElement("p")
+                        category.textContent = "Category: " + (product.category || "Tech")
+                        box.appendChild(category)
+
+                        const desc = document.createElement("p")
+                        desc.textContent = product.description
+                        box.appendChild(desc)
+
+                        const price = document.createElement("p")
+                        price.textContent = "Price: $" + product.price.toFixed(2)
+                        box.appendChild(price)
+
+                        const button = document.createElement("button")
+                        button.textContent = "Add to cart"
+                        button.onclick = function() {
+                            addToCart(product)
+                        }
+                        box.appendChild(button)
+
+                        list.appendChild(box)
+                    })
+                } catch (err) {
+                    console.error("Error loading products", err)
+                    list.innerHTML = "<p>Network error while loading products.</p>"
+                }
+            }
+
+            async function addToCart(product) {
+                const token = localStorage.getItem("authToken")
+
+                if (!token) {
+                    // force login before cart actions
+                    window.location.href = "/login"
+                    return
+                }
+
+                const msg = document.getElementById("msg")
+
+                try {
+                    const res = await fetch("/api/cart/add", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "Authorization": token
+                        },
+                        body: JSON.stringify({
+                            productId: product._id,
+                            qty: 1
+                        })
+                    })
+
+                    const data = await res.json()
+
+                    if (!res.ok) {
+                        msg.textContent = data.error || "Could not add to cart"
+                        msg.style.color = "red"
+                    } else {
+                        msg.textContent = "Added " + product.name + " to cart"
+                        msg.style.color = "green"
+                    }
+                } catch (err) {
+                    console.error("Error adding to cart", err)
+                    msg.textContent = "Network error while adding to cart"
+                    msg.style.color = "red"
+                }
+
+                setTimeout(function() {
+                    msg.textContent = ""
+                }, 3000)
+            }
+
+            window.onload = loadProducts
+        </script>
+    </head>
+    <body>
+
+        <div class="leftNav">
+            <h2>Menu</h2>
+            <a href="/home">Home</a>
+            <a href="/products">Products</a>
+            <a href="/cart">Cart</a>
+            <a href="/order">Order</a>
+            <a href="/profile">Profile</a>
+            <a href="/cart">Checkout</a>
+            <a href="/logout">Logout</a>
+        </div>
+
+        <div class = "pageContent">
+            <div class="heroBox">
+                <h1>Available Products</h1>
+                <p>Browse our latest tech items and add them to your cart!</p>
+            </div>
+            <p id="msg"></p>
+
+            <div id="productsList" class="productsList"></div>
+        </div>
+        
+    </body>
+</html>

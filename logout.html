@@ -1,0 +1,36 @@
+<!--
+Description: 
+    - /logout route
+    - Successful logout displayed 
+-->
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" href="style.css">
+        <script>
+            window.onload = function() {
+                localStorage.removeItem("authToken")
+            }
+        </script>
+    </head>
+    <body>
+        <div class = "leftNav">
+            <h2>Menu</h2>
+            <a href="/home">Home</a>
+            <a href="/products">Products</a>
+            <a href="/cart">Cart</a>
+            <a href="/orders">Orders</a>
+            <a href="/login">Login</a>
+            <a href="/register">Register</a>
+        </div>
+
+        <div class="logoutContainer">
+            <div class="logoutBox">
+                <h1>Successfully Logged Out</h1>
+                <p>You have been securely signed out of your account.</p>
+
+                <a class="returnBtn" href="/home">Return to Homepage</a>
+            </div>
+        </div>
+    </body>
+</html>

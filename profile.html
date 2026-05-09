@@ -1,0 +1,78 @@
+<!--
+Description: 
+    - Only visible when loggin in (if possible)
+    - Shows user details 
+    - Inlcude logout button, order history, anything else? 
+-->
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" href="style.css">
+        <script>
+            function loadData() {
+
+                const token = localStorage.getItem("authToken")
+
+                if (!token) {
+                    // force login before displaying profile
+                    window.location.href = "/login"
+                    return
+                }
+
+                fetch("/api/profile", {
+                    headers: {
+                        "Authorization": localStorage.getItem("authToken")
+                    }
+                })
+                .then(res => {
+                    if (!res.ok) {
+                        throw new Error("Issue with response")
+                    }
+                    return res.json()})
+                .then(data => {
+                    document.getElementById("username").textContent = data.username
+                    document.getElementById("name").textContent = data.username
+                    document.getElementById("email").textContent = data.email
+                })
+                .catch(err => {
+                    console.error("There was a problem with fetch")
+                })
+            }
+
+            function logout() {
+                window.location.href = "/logout"
+            }
+
+            window.onload = window.loadData
+        </script>
+    </head>
+    <body>
+        <div class = "leftNav">
+            <h2>Menu</h2>
+
+            <a href="/home">Home</a>
+            <a href="/products">Products</a>
+            <a href="/cart">Cart</a>
+            <a href="/orders">Orders</a>
+            <a href="/profile">Profile</a>
+            <a href="/logout">Logout</a>
+        </div>
+        <div class="profileContainer">
+            <div class="profileBox">
+                <h1>Your Profile</h1>
+                <p id="welcomeMsg">Welcome back, <strong id="name"></strong>!</p>
+
+                <div class="profileDetails">
+                    <p><strong>Username: </strong> <span id="username"></span></p>
+                    <p><strong>E-mail: </strong> <span id="email"></span></p>
+                </div>
+
+                <div class="profileActions">
+                    <a href="/orders">View Order History</a>
+                    <a href="/products"> Continue Shopping</a>
+                    <button class="logoutBtn" onclick="logout()">Logout</button>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

@@ -1,0 +1,455 @@
+/*
+Animations Source: https://www.w3schools.com/css/css3_animations.asp
+Media Source: https://www.w3schools.com/cssref/atrule_media.php
+
+Gradients and other functions such as rgba found on W3 Schools as well. 
+*/
+
+body {
+    margin: 0;
+    padding: 0; 
+    font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: white;
+    background: linear-gradient(135deg, #0f1624, #16233a, #0f1624);
+    background-size: cover;
+    background-attachment: fixed ;
+}
+
+a {
+    text-decoration: none;
+}
+
+.leftNav {
+    position: fixed;
+    top:0; 
+    left:0; 
+    height: 100%;
+    width: 250px;
+    background: rgba(15, 25, 45, 0.95);
+    backdrop-filter: blur(6px);
+    padding-top: 20px; 
+    border-right: 2px solid rbga(255, 255, 255, 0.08);
+    display: flex;
+    flex-direction: column;
+}
+
+.navTitle {
+    color: #4fc3f7;
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.leftNav a {
+    padding: 14px 25px; 
+    color: #d9e6ff;
+    font-size: 16px; 
+    transition: all 0.25s ease-in-out;
+    border-left: 4px solid transparent;
+}
+
+.leftNav a:hover {
+    background: rgba(79, 195, 247, 0.15);
+    border-left: 4px solid #4fc3f7; 
+    color: #ffffff;
+}
+
+.pageContent {
+    margin-left: 250px;
+    padding: 50px;
+}
+
+.heroBox {
+    max-width: 700px;
+    background: rgba(255,255,255,0.08);
+    padding: 40px;
+    border-radius: 15px;
+    border: 1px solid rgba(255,255,255,0.1);
+    box-shadow: 0 4px 25px rgba(0,0,0,0.2);
+    backdrop-filter: blur(4px);
+    animation: fadeInUp 0.8s ease;
+}
+
+.heroBox h1 {
+    font-size: 36px; 
+    color: #ffffff; 
+}
+
+.heroBox p {
+    font-size: 18px;
+    color: #cfe3ff
+}
+
+.ctaButton {
+    display: inline-block; 
+    margin-top: 25px; 
+    padding: 14px 24px; 
+    background: #4fc3f7;
+    color: #0a1220;
+    font-weight: bold; 
+    border-radius: 8px;
+    font-size: 18px;
+    transition: 0.25s;
+}
+
+.ctaButton:hover {
+    background: #81d9ff;
+    transform: scale(1.05);
+}
+
+input, select {
+    padding: 12px;
+    font-size: 16px;
+    width: 100%;
+    border-radius: 8px;
+    border: 2px solid rgba(255,255,255,0.25);
+    background: rgba(255,255,255,0.07);
+    color: white;
+    margin: 10px 0;
+}
+
+input:focus {
+    outline: none;
+    border-color: #4fc3f7;
+    background: rgba(255,255,255,0.1);
+}
+
+.productGrid {
+    margin-top: 25px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 25px;
+}
+
+.productBox {
+    background: rgba(255,255,255,0.08);
+    padding: 25px;
+    border-radius: 15px;
+    border: 1px solid rgba(255,255,255,0.1);
+    box-shadow: 0 3px 20px rgba(0,0,0,0.25);
+    text-align: center;
+    backdrop-filter: blur(4px);
+    animation: fadeInUp 0.8s ease;
+    margin-top: 10px;
+}
+
+.productBox:hover {
+    transform: translateY(-3px) scale(1.02);
+    transition: 0.25s ease;
+}
+
+.productImg {
+    width: 100%;
+    height: auto;
+    max-height: 200px;
+    object-fit: contain;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.05);
+}
+
+.cartItem {
+    background: rgba(255,255,255,0.05);
+    padding: 20px;
+    border-radius: 16px;
+    margin-bottom: 20px;
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    animation: fadeInUp 0.35s ease forwards;
+}
+
+.cartItem img {
+    width: 120px;
+    aspect-ratio: 1 / 1;
+    object-fit: contain;
+    background: rgba(255,255,255,0.04);
+    border-radius: 12px;
+    padding: 8px;
+}
+
+
+.cartItem h2 {
+    margin: 0;
+    font-size: 22px;
+    color: #ffffff;
+}
+
+.cartItem button {
+    margin: 5px;
+}
+
+.cartInfo {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    flex: 1;
+}
+
+.qtyControls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.productBox button,
+.qtyControls button,
+.cartItem button,
+#checkoutBtn {
+    background: #4fc3f7;
+    border: none;
+    padding: 6px 12px;
+    font-size: 16px;
+    border-radius: 8px;
+    color: #0a1220;
+    cursor: pointer;
+    transition: 0.25s;
+}
+
+.qtyControls button:hover,
+.cartItem button:hover {
+    background: #81d9ff;
+    transform: scale(1.05);
+}
+
+/* Remove button (special red version) */
+.cartItem .removeBtn {
+    background: #ff5c5c;
+    color: white;
+}
+
+.cartItem .removeBtn:hover {
+    background: #d64545;
+}
+
+
+.orderBox {
+    background: rgba(255,255,255,0.08);
+    border-radius: 12px;
+    padding: 25px;
+    margin: 15px 0;
+    border: 1px solid rgba(255,255,255,0.12);
+    box-shadow: 0 3px 20px rgba(0,0,0,0.25);
+    backdrop-filter: blur(4px);
+}
+
+.orderItems {
+    margin-top: 15px;
+}
+
+.orderItem {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 8px 0;
+}
+
+.orderImg, .orderItem img {
+    width: 60px;
+    height: 60px;
+    border-radius: 8px;
+    object-fit: cover;
+    border: 1px solid rgba(255,255,255,0.15);
+}
+
+.authContainer {
+    margin-left: 250px;
+    padding: 60px;
+    display: flex; 
+    justify-content: center; 
+    animation: fadeInUp 0.8s ease;
+}
+
+.authBox {
+    width: 420px; 
+    background: rgba(255, 255, 255, 0.08); 
+    padding: 35px; 
+    border-radius: 15px; 
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 4px 25px rgba(0, 0, 0, 0.25);
+    backdrop-filter: blur(6px);
+}
+
+.authbox h1 {
+    text-align: center; 
+    color: #4fc3f7
+}
+
+.authBox button {
+    width: 100%;
+    margin-top: 10px;
+    padding: 12px;
+    background: #4fc3f7;
+    border-radius: 8px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    border: none;
+    color: #0a1220;
+    transition: 0.25s;
+}
+
+
+.authBox button:hover {
+    background: #81d9ff;
+    transform: scale(1.03);
+}
+
+#errMsg {
+    color: #ff8c8c; 
+    margin-top: 10px;
+    text-align: center; 
+    min-height: 20px;
+}
+
+.profileContainer {
+    margin-left: 250px; 
+    padding: 50px; 
+    animation: fadeInUp 0.8s ease; 
+}
+
+.profileBox {
+    max-width:600px; 
+    background: rgba(255, 255, 255, 0.08);
+    padding: 40px; 
+    border-radius: 15px; 
+    border: 1px solid rgba(255, 255, 255, 0.1); 
+    box-shadow: 0 4px 25px rgba(0, 0, 0, 0.2); 
+    backdrop-filter: blur(6px);
+    animation: fadeinUp 0.9s ease; 
+}
+
+.profileBox h1 {
+    color: #4fc3f7;
+    margin-bottom: 10px;
+}
+
+.profileDetails {
+    margin-top: 20px;
+}
+
+.profileDetails p {
+    font-size: 18px;
+    margin: 8px 0;
+    color: #d9e6ff;
+}
+
+.profileActions {
+    margin-top: 25px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.profileActions a {
+    padding: 12px 18px;
+    background: rgba(79,195,247,0.15);
+    color: #4fc3f7;
+    border-radius: 8px;
+    transition: 0.25s;
+    text-align: center;
+    border: 1px solid rgba(79,195,247,0.25);
+}
+
+.profileActions a:hover {
+    background: #4fc3f7;
+    color: #0a1220;
+    transform: scale(1.03);
+}
+
+.logoutBtn {
+    padding: 12px 18px;
+    background: #ff4f4f;
+    color: white;
+    font-weight: bold;
+    border-radius: 8px;
+    border: none;
+    transition: 0.25s;
+    cursor: pointer;
+    font-size: 18px;
+}
+
+.logoutBtn:hover {
+    background: #ff7a7a;
+    transform: scale(1.05);
+}
+
+.logoutContainer {
+    margin-left: 250px; 
+    padding: 60px; 
+    animation: fadeInUp 0.8s ease; 
+}
+
+.logoutBox {
+    max-width: 250px; 
+    background: rgba(255, 255, 255, 0.08);
+    padding: 40px;
+    border-radius: 15px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 25px rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(6px);
+    animation: fadeInUp 1s ease; 
+}
+
+
+.logoutBox h1 {
+    color: #4fc3f7;
+    margin-bottom: 15px;
+}
+
+.logoutBox p {
+    font-size: 18px;
+    color: #d9e6ff;
+    margin-bottom: 25px;
+}
+
+.returnBtn {
+    display: inline-block;
+    background: #4fc3f7;
+    color: #0a1220;
+    padding: 14px 22px;
+    font-size: 18px;
+    border-radius: 8px;
+    font-weight: bold;
+    text-align: center;
+    transition: 0.25s ease;
+    border: none;
+    cursor: pointer;
+}
+
+.returnBtn:hover {
+    background: #81d9ff;
+    transform: scale(1.05);
+}
+
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 900px) {
+    .leftNav {
+        width: 200px;
+    }
+    .pageContent {
+        margin-left: 210px;
+    }
+}
+
+@media (max-width: 700px) {
+    .leftNav {
+        position: relative;
+        width: 100%;
+        height: auto;
+        border-right: none;
+        border-bottom: 2px solid rgba(255,255,255,0.08);
+    }
+    .pageContent {
+        margin-left: 0;
+        padding: 20px;
+    }
+}

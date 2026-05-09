@@ -1,0 +1,95 @@
+<!--
+Description: 
+    - Registration form (username, email, password)
+    - sends POST to /register
+-->
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" href="style.css">
+        <script>
+            async function handleRegister(event) {
+                event.preventDefault();
+
+                const username = document.getElementById("username").value.trim()
+                const email = document.getElementById("email").value.trim()
+                const password = document.getElementById("password").value.trim()
+
+                const body = {username, email, password}
+
+                try {
+                    const res = await fetch("/register", {
+                        method: "POST",
+                        headers: {"Content-Type": "application/json"},
+                        body: JSON.stringify(body)
+                    })
+
+                    const data = await res.json(); 
+
+                    if (!res.ok) {
+                        showError(data.error || "Register failed");
+                        return; 
+                    }
+
+                    if (data.token) {
+                        localStorage.setItem("authToken", data.token)
+                        window.location.href = "/profile"
+                    } else {
+                        window.location.href = "/login"
+                    }
+
+                } catch (err) {
+                    showError("Network error")
+                }
+            }
+
+            function showError(msg) {
+                const err = document.getElementById("errMsg");
+                err.textContent = msg;
+
+                setTimeout(() => {
+                    err.textContent = "";
+                }, 3000);
+            }
+        </script>
+
+        <!--We can put this in a separate file to make it look cleaner-->
+        <style>
+        </style>
+    </head>
+    <body>
+        <div class = "leftNav">
+            <h1>Menu</h1>
+
+            <a href="/home">Home</a>
+            <a href="/products">Products</a>
+            <a href="/cart">Cart</a>
+            <a href="/orders">Orders</a>
+            <a href="/profile">Profile</a>
+            <a href="/login">Login</a>
+        </div>
+
+        <div class="authContainer">
+            <div class="authBox">
+                <h1>Create Account</h1>
+                <form method="POST" action="/register" onsubmit="handleRegister(event)">
+                    <label>Username: </label>
+                    <input require type="text" id="username" name="username">
+                    <br>
+
+                    <label>Email: </label>
+                    <input require type="email" id="email" name="email">
+                    <br>
+
+                    <label>Password: </label>
+                    <input require type="password" id="password" name="password">
+                    <br>
+
+                    <button type="submit">Login</button>
+                </form>
+
+            </div>
+        </div>
+        <p id="errMsg"></p>
+    </body>
+</html>

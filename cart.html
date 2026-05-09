@@ -1,0 +1,279 @@
+<!--
+Description: 
+    - Only accessible when loggin in (if possible)
+    - Shows all items currently in users cart
+    - Update quantity/remove item 
+    - Button to proceed to checkout 
+-->
+<!DOCTYPE html>
+<html>
+    <!--Update based on user-->
+    <head>
+        <title>Your Cart</title>
+        <link rel="stylesheet" href="style.css">
+        <script>
+
+            var totalCost = 0.0;
+
+            async function getCart() {
+                const token = localStorage.getItem("authToken")
+
+                if (!token) {
+                    // force login before displaying cart
+                    window.location.href = "/login"
+                    return
+                }
+
+                const msg = document.getElementById("msg")
+
+                try {
+                    const res = await fetch("/api/cart", {
+                        headers: {
+                            "Authorization": token
+                        }
+                    })
+
+                    cart = await res.json();
+
+                    if (!res.ok) {
+                        msg.textContent = cart.error || "Could not load your cart"
+                        msg.style.color = "red"
+                    } else {
+                        displayCart(cart);  
+                    }
+
+     
+                } catch (err) {
+                    console.error("Error displaying cart", err)
+                    msg.textContent = "Network error while displaying to cart"
+                    msg.style.color = "red"
+                }
+            }
+
+
+            async function displayCart(cart) {
+                const list = document.getElementById("cartList");
+                list.textContent = "";
+                totalCost = 0;
+
+
+                const res = await fetch("/api/products")
+                if (!res.ok) {
+                    list.textContent = "Could not load products."
+                    return
+                }
+
+                const products = await res.json()
+
+                cart.items.forEach(function(cartItem) {
+
+                    const product = getProduct(cartItem, products);
+
+                    const card = document.createElement("div")
+                    card.className = "cartItem"
+
+                    const img = document.createElement("img");
+                    img.src = product.img;    
+                    img.className = "productImg";
+                    card.appendChild(img);
+
+                    const info = document.createElement("div")
+                    info.className = "cartInfo"
+
+                    const title = document.createElement("h2")
+                    title.textContent = `${product.name}`
+                    info.appendChild(title)
+
+                    const qtyRow = document.createElement("div")
+                    qtyRow.className = "qtyControls"
+
+                    const decreaseButton = document.createElement("button")
+                    decreaseButton.textContent = "-"
+                    decreaseButton.onclick = function() {
+                        changeAmount(cartItem, product, -1);
+                    }
+                    qtyRow.appendChild(decreaseButton)
+
+                    const qtyLabel = document.createElement("span")
+                    qtyLabel.textContent = `Qty: ${cartItem.qty}`
+                    qtyRow.appendChild(qtyLabel)
+
+                    const increaseButton = document.createElement("button")
+                    increaseButton.textContent = "+"
+                    increaseButton.onclick = function() {
+                        changeAmount(cartItem, product, 1);
+                    }
+                    qtyRow.appendChild(increaseButton)
+
+                    info.appendChild(qtyRow)
+
+
+                    const price = document.createElement("p")
+                    const currCost = (product.price * cartItem.qty);
+                    price.innerHTML = `<strong>Cost: $${currCost.toFixed(2)}</strong>`;
+                    info.appendChild(price)
+
+                    const button = document.createElement("button")
+                    button.className = "removeBtn"
+                    button.textContent = "Remove"
+                    button.onclick = function() {
+                        removeItem(product)
+                    }
+                    info.appendChild(button)
+                    card.appendChild(info)
+                    list.appendChild(card)
+
+                    totalCost += currCost
+                })
+
+                const title = document.createElement("h3")
+                title.textContent = `Total Cost: ${totalCost.toFixed(2)}`
+                list.appendChild(title)
+
+                const checkOutButton = document.createElement("button")
+                checkOutButton.textContent = "Checkout"
+                checkOutButton.id = "checkoutBtn"
+                checkOutButton.onclick = function() {
+                    checkout()
+                }
+                list.appendChild(checkOutButton)
+            }
+
+            async function checkout() {
+                window.location.href = "/checkout"
+            }
+
+            function getProduct(cartItem, products){
+                for (const p of products) {
+                    if(p._id.toString() == cartItem.productId.toString()) {
+                        return p;
+                    }
+                }
+
+                return null;
+            }
+
+            async function changeAmount(cartItem, product, amt) {
+
+                if (cartItem.qty + amt <= 0) {
+                    removeItem(product);
+                    return;
+                }
+
+                const token = localStorage.getItem("authToken")
+
+                if (!token) {
+                    // force login before cart actions
+                    window.location.href = "/login"
+                    return
+                }
+
+                const msg = document.getElementById("msg")
+
+                try {
+                    const res = await fetch("/api/cart/add", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "Authorization": token
+                        },
+                        body: JSON.stringify({
+                            productId: product._id,
+                            qty: amt
+                        })
+                    })
+
+                    const data = await res.json()
+
+                    if (!res.ok) {
+                        msg.textContent = data.error || "Could not change amount of Item"
+                        msg.style.color = "red"
+                    } else {
+    
+                        getCart();
+                    }
+                } catch (err) {
+                    console.error("Error adding to cart", err)
+                    msg.textContent = "Network error while adding to cart"
+                    msg.style.color = "red"
+                }
+
+                setTimeout(function() {
+                    msg.textContent = ""
+                }, 3000)
+            }
+
+            async function removeItem(product) {
+                const token = localStorage.getItem("authToken")
+
+                if (!token) {
+                    // force login before cart actions
+                    window.location.href = "/login"
+                    return
+                }
+
+                const msg = document.getElementById("msg")
+
+                try {
+                    const res = await fetch("/api/cart/remove", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "Authorization": token
+                        },
+                        body: JSON.stringify({
+                            productId: product._id,
+                        })
+                    })
+
+                    const data = await res.json()
+
+                    if (!res.ok) {
+                        msg.textContent = data.error || "Could not remove from cart"
+                        msg.style.color = "red"
+                    } else {
+                        msg.textContent = "Removed " + product.name + " from cart"
+                        msg.style.color = "green"
+
+                        getCart();
+                    }
+                } catch (err) {
+                    console.error("Error adding to cart", err)
+                    msg.textContent = "Network error while adding to cart"
+                    msg.style.color = "red"
+                }
+
+                setTimeout(function() {
+                    msg.textContent = ""
+                }, 3000)
+            }
+            window.onload = getCart
+        </script>
+    </head>
+    <body>
+        <div class="pageContainer">
+
+            <div class="leftNav">
+                <h2>Menu</h2>
+                <a href="/home">Home</a>
+                <a href="/products">Products</a>
+                <a href="/cart">Cart</a>
+                <a href="/orders">Orders</a>
+                <a href="/profile">Profile</a>
+                <a href="/logout">Logout</a>
+            </div>
+
+            <div class="pageContent">
+                <div class="heroBox">
+                    <h1>Your Cart</h1>
+                    <p>Review your items and adjust quantities before checkout.</p>
+                </div>
+
+                <p id="msg"></p>
+                <div id="cartList"></div>
+            </div>
+
+        </div>
+
+    </body>
+</html>
