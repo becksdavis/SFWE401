@@ -28,7 +28,7 @@ async function requireToken(req, res, next) {
     }
 
     const db = await getDB();
-    const session = await db.collection("sessions").findOne({token: token})
+    const session = await db.collection("sessions").findOne({token: {$eq: token}})
 
     if (!session) {
         return res.status(401).json({error: "Invalid Session"})
@@ -78,7 +78,7 @@ app.post("/login", async (req, res) => {
         return res.status(401).json({error: "Invalid Login"})
     }
 
-    const identifierQuery = username ? {username} : {email}
+    const identifierQuery = username ? {username: {$eq: username}} : {email: {$eq: email}}
     const user = await users.findOne(identifierQuery)
 
     if (!user || user.password !== password) {
@@ -102,7 +102,7 @@ app.get("/logout", async function(req, res) {
 
     if (isValidToken(token)) {
         const db = await getDB();
-        await db.collection("sessions").deleteOne({token: token})
+        await db.collection("sessions").deleteOne({token: {$eq: token}})
     }
     res.sendFile(path.join(__dirname, "logout.html"))
 })
