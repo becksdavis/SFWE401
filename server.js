@@ -16,15 +16,19 @@ app.use("/assets", express.static(path.join(__dirname, "assets")));
 
 
 // ensures user is authenticated before accessign specific page 
+function isValidToken(token) {
+    return typeof token === "string" && /^[0-9a-f]{64}$/.test(token)
+}
+
 async function requireToken(req, res, next) {
     const token = req.headers.authorization;
 
-    if (!token) {
+    if (!isValidToken(token)) {
         return res.status(401).json({error: "Missing token"})
     }
 
     const db = await getDB();
-    const session = await db.collection("sessions").findOne({token})
+    const session = await db.collection("sessions").findOne({token: token})
 
     if (!session) {
         return res.status(401).json({error: "Invalid Session"})
@@ -68,19 +72,16 @@ app.post("/login", async (req, res) => {
         return res.status(400).json({error: "Please provide username or email"})
     }
 
-    const query = {password}
-
-    if (username) {
-        query.username = username
+    if (typeof password !== "string" ||
+        (username && typeof username !== "string") ||
+        (email && typeof email !== "string")) {
+        return res.status(401).json({error: "Invalid Login"})
     }
 
-    if (email) {
-        query.email = email;
-    }
+    const identifierQuery = username ? {username} : {email}
+    const user = await users.findOne(identifierQuery)
 
-    const user = await users.findOne(query)
-
-    if (!user) {
+    if (!user || user.password !== password) {
         return res.status(401).json({error: "Invalid Login"})
     }
 
@@ -97,11 +98,11 @@ app.post("/login", async (req, res) => {
 
 // delete session token from db
 app.get("/logout", async function(req, res) {
-    const token = req.headers.authorization; 
+    const token = req.headers.authorization;
 
-    if (token) {
-        const db = await getDB(); 
-        await db.collection("sessions").deleteOne({token})
+    if (isValidToken(token)) {
+        const db = await getDB();
+        await db.collection("sessions").deleteOne({token: token})
     }
     res.sendFile(path.join(__dirname, "logout.html"))
 })
