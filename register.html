@@ -1,14 +1,61 @@
 <!--
-Description: 
+Description:
     - Registration form (username, email, password)
     - sends POST to /register
 -->
 <!DOCTYPE html>
-<html>
+<html lang="en">
     <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Register</title>
         <link rel="stylesheet" href="style.css">
+    </head>
+    <body>
+        <div class="leftNav">
+            <h1>Menu</h1>
+
+            <a href="/home">Home</a>
+            <a href="/products">Products</a>
+            <a href="/cart">Cart</a>
+            <a href="/orders">Orders</a>
+            <a href="/profile">Profile</a>
+            <a href="/login">Login</a>
+        </div>
+
+        <div class="authContainer">
+            <div class="authBox">
+                <h1>Create Account</h1>
+                <form id="registerForm" method="POST" action="/register">
+                    <label for="username">Username: </label>
+                    <input required type="text" id="username" name="username" autocomplete="username">
+                    <br>
+
+                    <label for="email">Email: </label>
+                    <input required type="email" id="email" name="email" autocomplete="email">
+                    <br>
+
+                    <label for="password">Password: </label>
+                    <input required type="password" id="password" name="password" autocomplete="new-password">
+                    <br>
+
+                    <button type="submit">Register</button>
+                </form>
+            </div>
+        </div>
+        <p id="errMsg"></p>
+
         <script>
-            async function handleRegister(event) {
+            function showError(msg) {
+                const err = document.getElementById("errMsg");
+                err.textContent = msg;
+
+                setTimeout(() => {
+                    err.textContent = "";
+                }, 3000);
+            }
+
+            document.getElementById("registerForm").addEventListener("submit", async function(event) {
                 event.preventDefault();
 
                 const username = document.getElementById("username").value.trim()
@@ -24,11 +71,11 @@ Description:
                         body: JSON.stringify(body)
                     })
 
-                    const data = await res.json(); 
+                    const data = await res.json();
 
                     if (!res.ok) {
                         showError(data.error || "Register failed");
-                        return; 
+                        return;
                     }
 
                     if (data.token) {
@@ -41,55 +88,7 @@ Description:
                 } catch (err) {
                     showError("Network error")
                 }
-            }
-
-            function showError(msg) {
-                const err = document.getElementById("errMsg");
-                err.textContent = msg;
-
-                setTimeout(() => {
-                    err.textContent = "";
-                }, 3000);
-            }
+            })
         </script>
-
-        <!--We can put this in a separate file to make it look cleaner-->
-        <style>
-        </style>
-    </head>
-    <body>
-        <div class = "leftNav">
-            <h1>Menu</h1>
-
-            <a href="/home">Home</a>
-            <a href="/products">Products</a>
-            <a href="/cart">Cart</a>
-            <a href="/orders">Orders</a>
-            <a href="/profile">Profile</a>
-            <a href="/login">Login</a>
-        </div>
-
-        <div class="authContainer">
-            <div class="authBox">
-                <h1>Create Account</h1>
-                <form method="POST" action="/register" onsubmit="handleRegister(event)">
-                    <label>Username: </label>
-                    <input require type="text" id="username" name="username">
-                    <br>
-
-                    <label>Email: </label>
-                    <input require type="email" id="email" name="email">
-                    <br>
-
-                    <label>Password: </label>
-                    <input require type="password" id="password" name="password">
-                    <br>
-
-                    <button type="submit">Login</button>
-                </form>
-
-            </div>
-        </div>
-        <p id="errMsg"></p>
     </body>
 </html>

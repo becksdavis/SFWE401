@@ -1,102 +1,13 @@
-<!-- Description: 
+<!-- Description:
     - Dsiplay past orders for the loggin-in user
     - Backend pulls orders from users collection in MongoDB or JSON -->
 <!DOCTYPE html>
-<html>
+<html lang="en">
     <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Order History</title>
         <link rel="stylesheet" href="style.css">
-        <script>
-            async function loadData() {
-                const token = localStorage.getItem("authToken")
-
-                if (!token) {
-                    window.location.href = "/login"
-                    return
-                }
-
-                const list = document.getElementById("ordersList")
-                const msg = document.getElementById("msg")
-
-                list.innerHTML = "<p>Loading orders...</p>"
-
-                fetch("/api/orders", {
-                    headers : {"Authorization": token}
-                })
-                .then(res => {
-                    if (!res.ok) {
-                        msg.textContent = "Could not load orders."
-                        msg.style.color = "red"
-                        list.textContent = ""
-                        return
-                    }
-
-                    return res.json()
-                })
-                .then(data => {
-                    list.textContent = ""
-
-                    if (data.length == 0) {
-                        list.textContent = "You have no past orders."
-                        return; 
-                    } 
-
-                    data.forEach(order => {
-                        const box = document.createElement("div");
-                        box.className = "orderBox";
-
-                        // Order date
-                        const date = document.createElement("h3");
-                        const d = new Date(order.createdAt);
-                        date.textContent = "Order Date: " + d.toLocaleString();
-                        box.appendChild(date);
-
-                        // Total
-                        const total = document.createElement("p");
-                        total.textContent = "Total: $" + order.total.toFixed(2);
-                        total.style.fontWeight = "bold";
-                        box.appendChild(total);
-
-                        // Items header
-                        const itemsHeader = document.createElement("p");
-                        itemsHeader.textContent = "Items:";
-                        box.appendChild(itemsHeader);
-
-                        // Items list
-                        const itemsDiv = document.createElement("div");
-                        itemsDiv.className = "orderItems";
-
-                        order.items.forEach(item => {
-                            const d = document.createElement("div")
-                            const i = document.createElement("p")
-
-                            const img = document.createElement("img")
-                            img.src = item.img;
-                            img.className = "orderImg"
-                            i.appendChild(img)
-
-                            const p = document.createElement("p");
-                            p.className = "orderItem";
-                            p.textContent = `- ${item.name} (Qty: ${item.qty}) — $${item.price.toFixed(2)}`;
-                            
-                            d.appendChild(i)
-                            d.appendChild(p)
-
-                            itemsDiv.appendChild(d);
-                        });
-
-                        box.appendChild(itemsDiv);
-                        list.appendChild(box);
-                    })
-                })
-                .catch(err => {
-                    console.error("Error loading orders", err);
-                    msg.textContent = "Network error while loading orders.";
-                    msg.style.color = "red";
-                })
-            }
-
-            window.onload = loadData
-        </script>
     </head>
     <body>
         <div class="pageContent">
@@ -117,14 +28,100 @@
                     <p>View all your previous purchases with item thumbnails!</p>
                 </div>
 
-                <div id="ordersList">
-
-                </div>
+                <div id="ordersList"></div>
             </div>
         </div>
 
         <p id="msg"></p>
 
-        <div id="ordersList"></div>
+        <script>
+            async function loadData() {
+                const token = localStorage.getItem("authToken")
+
+                if (!token) {
+                    window.location.href = "/login"
+                    return
+                }
+
+                const list = document.getElementById("ordersList")
+                const msg = document.getElementById("msg")
+
+                list.innerHTML = "<p>Loading orders...</p>"
+
+                fetch("/api/orders", {
+                    headers: {"Authorization": token}
+                })
+                .then(res => {
+                    if (!res.ok) {
+                        msg.textContent = "Could not load orders."
+                        msg.style.color = "red"
+                        list.textContent = ""
+                        return
+                    }
+
+                    return res.json()
+                })
+                .then(data => {
+                    list.textContent = ""
+
+                    if (data.length == 0) {
+                        list.textContent = "You have no past orders."
+                        return;
+                    }
+
+                    data.forEach(order => {
+                        const box = document.createElement("div");
+                        box.className = "orderBox";
+
+                        const date = document.createElement("h3");
+                        const d = new Date(order.createdAt);
+                        date.textContent = "Order Date: " + d.toLocaleString();
+                        box.appendChild(date);
+
+                        const total = document.createElement("p");
+                        total.textContent = "Total: $" + order.total.toFixed(2);
+                        total.style.fontWeight = "bold";
+                        box.appendChild(total);
+
+                        const itemsHeader = document.createElement("p");
+                        itemsHeader.textContent = "Items:";
+                        box.appendChild(itemsHeader);
+
+                        const itemsDiv = document.createElement("div");
+                        itemsDiv.className = "orderItems";
+
+                        order.items.forEach(item => {
+                            const d = document.createElement("div")
+                            const i = document.createElement("p")
+
+                            const img = document.createElement("img")
+                            img.src = item.img;
+                            img.alt = item.name || "Order item"
+                            img.className = "orderImg"
+                            i.appendChild(img)
+
+                            const p = document.createElement("p");
+                            p.className = "orderItem";
+                            p.textContent = `- ${item.name} (Qty: ${item.qty}) — $${item.price.toFixed(2)}`;
+
+                            d.appendChild(i)
+                            d.appendChild(p)
+
+                            itemsDiv.appendChild(d);
+                        });
+
+                        box.appendChild(itemsDiv);
+                        list.appendChild(box);
+                    })
+                })
+                .catch(err => {
+                    console.error("Error loading orders", err);
+                    msg.textContent = "Network error while loading orders.";
+                    msg.style.color = "red";
+                })
+            }
+
+            document.addEventListener("DOMContentLoaded", loadData)
+        </script>
     </body>
 </html>

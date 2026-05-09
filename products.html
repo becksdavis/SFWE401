@@ -1,13 +1,39 @@
 <!--
-Desciption: 
-    - Displays all products by category 
-    - Each item has own dropdown description or page 
-    - /products 
+Desciption:
+    - Displays all products by category
+    - Each item has own dropdown description or page
+    - /products
 -->
 <!DOCTYPE html>
-<html>
+<html lang="en">
     <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Products</title>
         <link rel="stylesheet" href="style.css">
+    </head>
+    <body>
+        <div class="leftNav">
+            <h2>Menu</h2>
+            <a href="/home">Home</a>
+            <a href="/products">Products</a>
+            <a href="/cart">Cart</a>
+            <a href="/order">Order</a>
+            <a href="/profile">Profile</a>
+            <a href="/cart">Checkout</a>
+            <a href="/logout">Logout</a>
+        </div>
+
+        <div class="pageContent">
+            <div class="heroBox">
+                <h1>Available Products</h1>
+                <p>Browse our latest tech items and add them to your cart!</p>
+            </div>
+            <p id="msg"></p>
+
+            <div id="productsList" class="productsList"></div>
+        </div>
+
         <script>
             async function loadProducts() {
                 const list = document.getElementById("productsList")
@@ -36,6 +62,7 @@ Desciption:
 
                         const img = document.createElement("img")
                         img.src = product.img
+                        img.alt = product.name
                         img.className = "productImg"
                         box.appendChild(img)
 
@@ -57,9 +84,9 @@ Desciption:
 
                         const button = document.createElement("button")
                         button.textContent = "Add to cart"
-                        button.onclick = function() {
+                        button.addEventListener("click", function() {
                             addToCart(product)
-                        }
+                        })
                         box.appendChild(button)
 
                         list.appendChild(box)
@@ -74,7 +101,6 @@ Desciption:
                 const token = localStorage.getItem("authToken")
 
                 if (!token) {
-                    // force login before cart actions
                     window.location.href = "/login"
                     return
                 }
@@ -114,31 +140,7 @@ Desciption:
                 }, 3000)
             }
 
-            window.onload = loadProducts
+            document.addEventListener("DOMContentLoaded", loadProducts)
         </script>
-    </head>
-    <body>
-
-        <div class="leftNav">
-            <h2>Menu</h2>
-            <a href="/home">Home</a>
-            <a href="/products">Products</a>
-            <a href="/cart">Cart</a>
-            <a href="/order">Order</a>
-            <a href="/profile">Profile</a>
-            <a href="/cart">Checkout</a>
-            <a href="/logout">Logout</a>
-        </div>
-
-        <div class = "pageContent">
-            <div class="heroBox">
-                <h1>Available Products</h1>
-                <p>Browse our latest tech items and add them to your cart!</p>
-            </div>
-            <p id="msg"></p>
-
-            <div id="productsList" class="productsList"></div>
-        </div>
-        
     </body>
 </html>

@@ -1,25 +1,50 @@
 <!--
-Description: 
+Description:
     - Only accessible when loggin in (if possible)
     - Shows all items currently in users cart
-    - Update quantity/remove item 
-    - Button to proceed to checkout 
+    - Update quantity/remove item
+    - Button to proceed to checkout
 -->
 <!DOCTYPE html>
-<html>
-    <!--Update based on user-->
+<html lang="en">
     <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Your Cart</title>
         <link rel="stylesheet" href="style.css">
-        <script>
+    </head>
+    <body>
+        <div class="pageContainer">
 
+            <div class="leftNav">
+                <h2>Menu</h2>
+                <a href="/home">Home</a>
+                <a href="/products">Products</a>
+                <a href="/cart">Cart</a>
+                <a href="/orders">Orders</a>
+                <a href="/profile">Profile</a>
+                <a href="/logout">Logout</a>
+            </div>
+
+            <div class="pageContent">
+                <div class="heroBox">
+                    <h1>Your Cart</h1>
+                    <p>Review your items and adjust quantities before checkout.</p>
+                </div>
+
+                <p id="msg"></p>
+                <div id="cartList"></div>
+            </div>
+
+        </div>
+
+        <script>
             var totalCost = 0.0;
 
             async function getCart() {
                 const token = localStorage.getItem("authToken")
 
                 if (!token) {
-                    // force login before displaying cart
                     window.location.href = "/login"
                     return
                 }
@@ -33,16 +58,15 @@ Description:
                         }
                     })
 
-                    cart = await res.json();
+                    const cart = await res.json();
 
                     if (!res.ok) {
                         msg.textContent = cart.error || "Could not load your cart"
                         msg.style.color = "red"
                     } else {
-                        displayCart(cart);  
+                        displayCart(cart);
                     }
 
-     
                 } catch (err) {
                     console.error("Error displaying cart", err)
                     msg.textContent = "Network error while displaying to cart"
@@ -50,12 +74,10 @@ Description:
                 }
             }
 
-
             async function displayCart(cart) {
                 const list = document.getElementById("cartList");
                 list.textContent = "";
                 totalCost = 0;
-
 
                 const res = await fetch("/api/products")
                 if (!res.ok) {
@@ -73,7 +95,8 @@ Description:
                     card.className = "cartItem"
 
                     const img = document.createElement("img");
-                    img.src = product.img;    
+                    img.src = product.img;
+                    img.alt = product.name;
                     img.className = "productImg";
                     card.appendChild(img);
 
@@ -89,9 +112,9 @@ Description:
 
                     const decreaseButton = document.createElement("button")
                     decreaseButton.textContent = "-"
-                    decreaseButton.onclick = function() {
+                    decreaseButton.addEventListener("click", function() {
                         changeAmount(cartItem, product, -1);
-                    }
+                    })
                     qtyRow.appendChild(decreaseButton)
 
                     const qtyLabel = document.createElement("span")
@@ -100,13 +123,12 @@ Description:
 
                     const increaseButton = document.createElement("button")
                     increaseButton.textContent = "+"
-                    increaseButton.onclick = function() {
+                    increaseButton.addEventListener("click", function() {
                         changeAmount(cartItem, product, 1);
-                    }
+                    })
                     qtyRow.appendChild(increaseButton)
 
                     info.appendChild(qtyRow)
-
 
                     const price = document.createElement("p")
                     const currCost = (product.price * cartItem.qty);
@@ -116,9 +138,9 @@ Description:
                     const button = document.createElement("button")
                     button.className = "removeBtn"
                     button.textContent = "Remove"
-                    button.onclick = function() {
+                    button.addEventListener("click", function() {
                         removeItem(product)
-                    }
+                    })
                     info.appendChild(button)
                     card.appendChild(info)
                     list.appendChild(card)
@@ -133,19 +155,15 @@ Description:
                 const checkOutButton = document.createElement("button")
                 checkOutButton.textContent = "Checkout"
                 checkOutButton.id = "checkoutBtn"
-                checkOutButton.onclick = function() {
-                    checkout()
-                }
+                checkOutButton.addEventListener("click", function() {
+                    window.location.href = "/checkout"
+                })
                 list.appendChild(checkOutButton)
             }
 
-            async function checkout() {
-                window.location.href = "/checkout"
-            }
-
-            function getProduct(cartItem, products){
+            function getProduct(cartItem, products) {
                 for (const p of products) {
-                    if(p._id.toString() == cartItem.productId.toString()) {
+                    if (p._id.toString() == cartItem.productId.toString()) {
                         return p;
                     }
                 }
@@ -163,7 +181,6 @@ Description:
                 const token = localStorage.getItem("authToken")
 
                 if (!token) {
-                    // force login before cart actions
                     window.location.href = "/login"
                     return
                 }
@@ -189,7 +206,6 @@ Description:
                         msg.textContent = data.error || "Could not change amount of Item"
                         msg.style.color = "red"
                     } else {
-    
                         getCart();
                     }
                 } catch (err) {
@@ -207,7 +223,6 @@ Description:
                 const token = localStorage.getItem("authToken")
 
                 if (!token) {
-                    // force login before cart actions
                     window.location.href = "/login"
                     return
                 }
@@ -247,33 +262,8 @@ Description:
                     msg.textContent = ""
                 }, 3000)
             }
-            window.onload = getCart
+
+            document.addEventListener("DOMContentLoaded", getCart)
         </script>
-    </head>
-    <body>
-        <div class="pageContainer">
-
-            <div class="leftNav">
-                <h2>Menu</h2>
-                <a href="/home">Home</a>
-                <a href="/products">Products</a>
-                <a href="/cart">Cart</a>
-                <a href="/orders">Orders</a>
-                <a href="/profile">Profile</a>
-                <a href="/logout">Logout</a>
-            </div>
-
-            <div class="pageContent">
-                <div class="heroBox">
-                    <h1>Your Cart</h1>
-                    <p>Review your items and adjust quantities before checkout.</p>
-                </div>
-
-                <p id="msg"></p>
-                <div id="cartList"></div>
-            </div>
-
-        </div>
-
     </body>
 </html>

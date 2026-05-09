@@ -1,53 +1,19 @@
 <!--
-Description: 
+Description:
     - Only visible when loggin in (if possible)
-    - Shows user details 
-    - Inlcude logout button, order history, anything else? 
+    - Shows user details
+    - Inlcude logout button, order history, anything else?
 -->
 <!DOCTYPE html>
-<html>
+<html lang="en">
     <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Profile</title>
         <link rel="stylesheet" href="style.css">
-        <script>
-            function loadData() {
-
-                const token = localStorage.getItem("authToken")
-
-                if (!token) {
-                    // force login before displaying profile
-                    window.location.href = "/login"
-                    return
-                }
-
-                fetch("/api/profile", {
-                    headers: {
-                        "Authorization": localStorage.getItem("authToken")
-                    }
-                })
-                .then(res => {
-                    if (!res.ok) {
-                        throw new Error("Issue with response")
-                    }
-                    return res.json()})
-                .then(data => {
-                    document.getElementById("username").textContent = data.username
-                    document.getElementById("name").textContent = data.username
-                    document.getElementById("email").textContent = data.email
-                })
-                .catch(err => {
-                    console.error("There was a problem with fetch")
-                })
-            }
-
-            function logout() {
-                window.location.href = "/logout"
-            }
-
-            window.onload = window.loadData
-        </script>
     </head>
     <body>
-        <div class = "leftNav">
+        <div class="leftNav">
             <h2>Menu</h2>
 
             <a href="/home">Home</a>
@@ -70,9 +36,46 @@ Description:
                 <div class="profileActions">
                     <a href="/orders">View Order History</a>
                     <a href="/products"> Continue Shopping</a>
-                    <button class="logoutBtn" onclick="logout()">Logout</button>
+                    <button class="logoutBtn" id="logoutBtn">Logout</button>
                 </div>
             </div>
         </div>
+
+        <script>
+            function loadData() {
+                const token = localStorage.getItem("authToken")
+
+                if (!token) {
+                    window.location.href = "/login"
+                    return
+                }
+
+                fetch("/api/profile", {
+                    headers: {
+                        "Authorization": localStorage.getItem("authToken")
+                    }
+                })
+                .then(res => {
+                    if (!res.ok) {
+                        throw new Error("Issue with response")
+                    }
+                    return res.json()
+                })
+                .then(data => {
+                    document.getElementById("username").textContent = data.username
+                    document.getElementById("name").textContent = data.username
+                    document.getElementById("email").textContent = data.email
+                })
+                .catch(err => {
+                    console.error("There was a problem with fetch")
+                })
+            }
+
+            document.getElementById("logoutBtn").addEventListener("click", function() {
+                window.location.href = "/logout"
+            })
+
+            document.addEventListener("DOMContentLoaded", loadData)
+        </script>
     </body>
 </html>

@@ -1,21 +1,45 @@
 <!--
-Descirption: 
+Descirption:
     - Shows order confirmation
     - Shows subtotal, total, and tax
     - Submit order (POST to /checkout)
     - Deliver order to MongDB JSON/collection
 -->
 <!DOCTYPE html>
-<html>
-    <header>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Checkout Complete!</title>
         <link rel="stylesheet" href="style.css">
+    </head>
+    <body>
+        <div class="leftNav">
+            <h2>Menu</h2>
+
+            <a href="/login">Login</a>
+            <a href="/register">Register</a>
+            <a href="/profile">Profile</a>
+            <a href="/products">Products</a>
+            <a href="/cart">Cart</a>
+            <a href="/home">Home</a>
+        </div>
+
+        <div class="pageContent">
+            <div class="heroBox">
+                <h1>Checkout Complete</h1>
+                <p>Your order has been processed successfully!</p>
+            </div>
+            <p id="msg"></p>
+
+            <div id="checkoutCard" class="fadeInUp"></div>
+        </div>
+
         <script>
             async function completeCheckout() {
                 const token = localStorage.getItem("authToken")
 
                 if (!token) {
-                    // force login before cart actions
                     window.location.href = "/login"
                     return
                 }
@@ -29,16 +53,15 @@ Descirption:
                         }
                     })
 
-                    cart = await res.json();
+                    const cart = await res.json();
 
                     if (!res.ok) {
                         msg.textContent = cart.error || "Could not load your cart"
                         msg.style.color = "red"
                     } else {
-                        calculateCost(cart);  
+                        calculateCost(cart);
                     }
 
-                   
                 } catch (err) {
                     console.error("Error adding to cart", err)
                     msg.textContent = "Network error while adding to cart"
@@ -49,13 +72,13 @@ Descirption:
             async function calculateCost(cart) {
                 const res = await fetch("/api/products")
                 if (!res.ok) {
-                    list.textContent = "Could not load products."
+                    document.getElementById("msg").textContent = "Could not load products."
                     return
                 }
 
                 const products = await res.json()
 
-                priceObject = {};
+                const priceObject = {};
 
                 cart.items.forEach(function(cartItem) {
                     const product = getProduct(cartItem, products);
@@ -70,7 +93,6 @@ Descirption:
                 const token = localStorage.getItem("authToken")
 
                 if (!token) {
-                    // force login before cart actions
                     window.location.href = "/login"
                     return
                 }
@@ -110,9 +132,9 @@ Descirption:
                 }
             }
 
-            function getProduct(cartItem, products){
+            function getProduct(cartItem, products) {
                 for (const p of products) {
-                    if(p._id.toString() == cartItem.productId.toString()) {
+                    if (p._id.toString() == cartItem.productId.toString()) {
                         return p;
                     }
                 }
@@ -120,31 +142,7 @@ Descirption:
                 return null;
             }
 
-
-            window.onload = completeCheckout
+            document.addEventListener("DOMContentLoaded", completeCheckout)
         </script>
-    </header>
-    <body>
-        <div class = "leftNav">
-            <h2>Menu</h2>
-
-            <a href="/login">Login</a>
-            <a href="/register">Register</a>
-            <a href="/profile">Profile</a>
-            <a href="/products">Products</a>
-            <a href="/cart">Cart</a>
-            <a href="/home">Home</a>
-        </div>
-
-        <div class="pageContent">
-            <div class="heroBox">
-                <h1>Checkout Complete</h1>
-                <p>Your order has been processed successfully!</p>
-            </div>
-            <p id="msg"></p>
-
-            <div id="checkoutCard" class="fadeInUp"></div>
-        </div>
     </body>
-
 </html>
